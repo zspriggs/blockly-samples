@@ -11,7 +11,7 @@ on:
         default: 'main'
         type: string
       core_branch:
-        description: 'Blockly core branch to publish from for (plugins)'
+        description: 'Blockly core branch to publish from (for plugins)'
         required: true
         default: 'main'
         type: string
