@@ -212,7 +212,9 @@ function createExampleTabs(pageRoot, pages, isLocal) {
  */
 function createPluginPage(pluginDir, isLocal) {
   const pluginPath = path.join(PLUGIN_FOLDER_PATH, pluginDir);
-  const packageJson = require(resolveApp(path.join(pluginPath, 'package.json')));
+  const packageJson = require(
+    resolveApp(path.join(pluginPath, 'package.json')),
+  );
   const initialPath = path.join(pluginPath, 'test', 'index.html');
   const initialContents = fs.readFileSync(initialPath).toString();
 
@@ -239,7 +241,9 @@ function createPluginPage(pluginDir, isLocal) {
  *     building for gh-pages.
  */
 function createReadmePage(pluginDir, isLocal) {
-  const packageJson = require(resolveApp(path.join(PLUGIN_FOLDER_PATH, pluginDir, 'package.json')));
+  const packageJson = require(
+    resolveApp(path.join(PLUGIN_FOLDER_PATH, pluginDir, 'package.json')),
+  );
   const initialContents = fs
     .readFileSync(path.join(PLUGIN_FOLDER_PATH, pluginDir, 'README.md'))
     .toString();
@@ -284,7 +288,11 @@ function createReadmePage(pluginDir, isLocal) {
   // Make sure the directory exists, then write to it.
   const dirPath = path.join('gh-pages', 'plugins', pluginDir);
   fs.mkdirSync(dirPath, {recursive: true});
-  fs.writeFileSync(path.join(dirPath, 'README.html'), modifiedContents, 'utf-8');
+  fs.writeFileSync(
+    path.join(dirPath, 'README.html'),
+    modifiedContents,
+    'utf-8',
+  );
 }
 
 /**
@@ -298,9 +306,23 @@ function preparePlugin(pluginDir, isLocal) {
   console.log(`Preparing ${pluginDir} plugin for deployment.`);
   createPluginPage(pluginDir, isLocal);
   createReadmePage(pluginDir, isLocal);
-  const testBundleFilePath = path.join(PLUGIN_FOLDER_PATH, pluginDir, 'build', 'test_bundle.js');
-  const destinationFilePath = path.join('gh-pages', 'plugins', pluginDir, 'build', 'test_bundle.js');
-  if (fs.existsSync(testBundleFilePath) && fs.statSync(testBundleFilePath).isFile()) {
+  const testBundleFilePath = path.join(
+    PLUGIN_FOLDER_PATH,
+    pluginDir,
+    'build',
+    'test_bundle.js',
+  );
+  const destinationFilePath = path.join(
+    'gh-pages',
+    'plugins',
+    pluginDir,
+    'build',
+    'test_bundle.js',
+  );
+  if (
+    fs.existsSync(testBundleFilePath) &&
+    fs.statSync(testBundleFilePath).isFile()
+  ) {
     fs.mkdirSync(path.dirname(destinationFilePath), {recursive: true});
     fs.copyFileSync(testBundleFilePath, destinationFilePath);
   }
@@ -486,7 +508,12 @@ function prepareExample(exampleDir, isLocal, done) {
   const pages = fileList.filter((f) => pageRegex.test(f));
   // Add headers and footers to HTML pages.
   pages.forEach((page) =>
-    createExamplePage(path.join(baseDir, exampleDir), page, demoConfig, isLocal),
+    createExamplePage(
+      path.join(baseDir, exampleDir),
+      page,
+      demoConfig,
+      isLocal,
+    ),
   );
 
   // Copy over all other files mentioned in the demoConfig to the

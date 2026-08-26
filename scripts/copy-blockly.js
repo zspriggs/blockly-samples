@@ -49,7 +49,14 @@ const {copyDirectoryContents} = require('./copy-helpers');
 
     // Also copy local workspace plugins from the `plugins/` directory (this repo).
     try {
-      const pluginsDir = path.resolve(__dirname, '..', '..', 'blockly', 'packages', 'plugins');
+      const pluginsDir = path.resolve(
+        __dirname,
+        '..',
+        '..',
+        'blockly',
+        'packages',
+        'plugins',
+      );
       const pluginDirs = await fs.readdir(pluginsDir, {withFileTypes: true});
       const copiedLocal = [];
       for (const d of pluginDirs) {
