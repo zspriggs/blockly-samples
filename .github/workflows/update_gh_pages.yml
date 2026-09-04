@@ -45,6 +45,7 @@ jobs:
 
       - name: NPM install
         # Use CI so that we don't update dependencies in this step.
+        working-directory: blockly-samples
         run: |
           npm ci
 
@@ -53,6 +54,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # deploys to the current repo,
         # so you can use this workflow from a fork to update your personal gh-pages
+        working-directory: blockly-samples
         run: |
           npm run deploy:prepare
           git remote set-url origin https://git:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
