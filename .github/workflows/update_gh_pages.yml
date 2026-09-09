@@ -43,9 +43,15 @@ jobs:
         with:
           node-version: 24
 
-      - name: NPM install
+      - name: NPM install - Samples
         # Use CI so that we don't update dependencies in this step.
         working-directory: blockly-samples
+        run: |
+          npm ci
+
+      - name: NPM install - Blockly
+        # Use CI so that we don't update dependencies in this step.
+        working-directory: blockly
         run: |
           npm ci
 
