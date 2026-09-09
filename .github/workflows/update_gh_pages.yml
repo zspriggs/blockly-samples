@@ -52,9 +52,9 @@ jobs:
       - name: Pepare Plugins for deployment
         working-directory: blockly
         run: |
-            npx nx reset && lerna run clean --scope '@blockly/*' && \
-            lerna run build --scope '@blockly/*' && \
-            lerna run predeploy --scope '@blockly/*' 
+          npx nx reset && lerna run clean --scope '@blockly/*' && \
+          lerna run build --scope '@blockly/*' && \
+          lerna run predeploy --scope '@blockly/*'
 
       - name: Deploy to GH Pages
         env:
