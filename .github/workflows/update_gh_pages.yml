@@ -26,20 +26,20 @@ jobs:
 
     steps:
       - name: Checkout Blockly-Samples
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.samples_branch || 'main' }}
           path: blockly-samples
 
       - name: Checkout Blockly
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           repository: 'RaspberryPiFoundation/blockly'
           ref: ${{ inputs.core_branch || 'main' }}
           path: blockly
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -48,6 +48,13 @@ jobs:
         working-directory: blockly-samples
         run: |
           npm ci
+
+      - name: Pepare Plugins for deployment
+        working-directory: blockly
+        run: |
+            npx nx reset && lerna run clean --scope '@blockly/*' && \
+            lerna run build --scope '@blockly/*' && \
+            lerna run predeploy --scope '@blockly/*' 
 
       - name: Deploy to GH Pages
         env:
