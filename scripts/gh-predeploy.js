@@ -20,6 +20,8 @@ const {copyFilesWithBase, copyDirectoryContents} = require('./copy-helpers');
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
 
+const PLUGIN_FOLDER_PATH = path.join('..', 'blockly', 'packages', 'plugins');
+
 /**
  * Inject head HTML for a plugin or example page on gh-pages.
  * @param {string} initialContents The initial page HTML, as a string.
@@ -209,8 +211,11 @@ function createExampleTabs(pageRoot, pages, isLocal) {
  *     building for gh-pages.
  */
 function createPluginPage(pluginDir, isLocal) {
-  const packageJson = require(resolveApp(`plugins/${pluginDir}/package.json`));
-  const initialPath = path.join('plugins', pluginDir, 'test', 'index.html');
+  const pluginPath = path.join(PLUGIN_FOLDER_PATH, pluginDir);
+  const packageJson = require(
+    resolveApp(path.join(pluginPath, 'package.json')),
+  );
+  const initialPath = path.join(pluginPath, 'test', 'index.html');
   const initialContents = fs.readFileSync(initialPath).toString();
 
   let contents = injectHeader(
@@ -236,9 +241,11 @@ function createPluginPage(pluginDir, isLocal) {
  *     building for gh-pages.
  */
 function createReadmePage(pluginDir, isLocal) {
-  const packageJson = require(resolveApp(`plugins/${pluginDir}/package.json`));
+  const packageJson = require(
+    resolveApp(path.join(PLUGIN_FOLDER_PATH, pluginDir, 'package.json')),
+  );
   const initialContents = fs
-    .readFileSync(`./plugins/${pluginDir}/README.md`)
+    .readFileSync(path.join(PLUGIN_FOLDER_PATH, pluginDir, 'README.md'))
     .toString();
 
   const converter = new showdown.Converter();
@@ -279,9 +286,13 @@ function createReadmePage(pluginDir, isLocal) {
   modifiedContents = injectFooter(modifiedContents);
 
   // Make sure the directory exists, then write to it.
-  const dirString = `./gh-pages/plugins/${pluginDir}/`;
-  fs.mkdirSync(dirString, {recursive: true});
-  fs.writeFileSync(`${dirString}/README.html`, modifiedContents, 'utf-8');
+  const dirPath = path.join('gh-pages', 'plugins', pluginDir);
+  fs.mkdirSync(dirPath, {recursive: true});
+  fs.writeFileSync(
+    path.join(dirPath, 'README.html'),
+    modifiedContents,
+    'utf-8',
+  );
 }
 
 /**
@@ -295,11 +306,26 @@ function preparePlugin(pluginDir, isLocal) {
   console.log(`Preparing ${pluginDir} plugin for deployment.`);
   createPluginPage(pluginDir, isLocal);
   createReadmePage(pluginDir, isLocal);
-  copyFilesWithBase(
-    [path.join('plugins', pluginDir, 'build', 'test_bundle.js')],
-    'plugins',
-    path.join('gh-pages', 'plugins'),
+  const testBundleFilePath = path.join(
+    PLUGIN_FOLDER_PATH,
+    pluginDir,
+    'build',
+    'test_bundle.js',
   );
+  const destinationFilePath = path.join(
+    'gh-pages',
+    'plugins',
+    pluginDir,
+    'build',
+    'test_bundle.js',
+  );
+  if (
+    fs.existsSync(testBundleFilePath) &&
+    fs.statSync(testBundleFilePath).isFile()
+  ) {
+    fs.mkdirSync(path.dirname(destinationFilePath), {recursive: true});
+    fs.copyFileSync(testBundleFilePath, destinationFilePath);
+  }
 }
 
 /**
@@ -308,13 +334,12 @@ function preparePlugin(pluginDir, isLocal) {
  *   for deployment to GitHub Pages.
  */
 function getPluginFolders() {
-  const dir = 'plugins';
-  return fs.readdirSync(dir).filter(function (file) {
+  return fs.readdirSync(PLUGIN_FOLDER_PATH).filter(function (file) {
     return (
-      fs.statSync(path.join(dir, file)).isDirectory() &&
-      fs.existsSync(path.join(dir, file, 'package.json')) &&
+      fs.statSync(path.join(PLUGIN_FOLDER_PATH, file)).isDirectory() &&
+      fs.existsSync(path.join(PLUGIN_FOLDER_PATH, file, 'package.json')) &&
       // Only prepare plugins with test pages.
-      fs.existsSync(path.join(dir, file, '/test/index.html'))
+      fs.existsSync(path.join(PLUGIN_FOLDER_PATH, file, '/test/index.html'))
     );
   });
 }
@@ -483,7 +508,12 @@ function prepareExample(exampleDir, isLocal, done) {
   const pages = fileList.filter((f) => pageRegex.test(f));
   // Add headers and footers to HTML pages.
   pages.forEach((page) =>
-    createExamplePage(`${baseDir}/${exampleDir}`, page, demoConfig, isLocal),
+    createExamplePage(
+      path.join(baseDir, exampleDir),
+      page,
+      demoConfig,
+      isLocal,
+    ),
   );
 
   // Copy over all other files mentioned in the demoConfig to the
