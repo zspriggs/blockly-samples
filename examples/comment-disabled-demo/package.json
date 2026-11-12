@@ -1,0 +1,19 @@
+{
+  "name": "blockly-comment-disabled-demo",
+  "version": "13.2.0",
+  "private": true,
+  "blocklyDemoConfig": {
+    "title": "Disabled Block Comments",
+    "description": "A demo showing how to make disabled blocks generate comments.",
+    "files": [
+      "index.html",
+      "index.js",
+      "../lib/blockly/*_compressed.js",
+      "../lib/blockly/*_compressed.js.map",
+      "../lib/blockly/msg/en.js"
+    ]
+  },
+  "dependencies": {
+    "blockly": "^13.2.0"
+  }
+}
